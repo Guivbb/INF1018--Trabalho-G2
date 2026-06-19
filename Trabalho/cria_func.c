@@ -1,5 +1,5 @@
-// Guilherme Vilas Boas Barbosa
-//Carina Cavalcante Chaves Leite 2511668
+//Guilherme Vilas Boas Barbosa 2411726 3WA
+//Carina Cavalcante Chaves Leite 2511668 3WC
 #include "cria_func.h"
 #include <stdint.h>
 
