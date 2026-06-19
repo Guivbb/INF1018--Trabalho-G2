@@ -1,3 +1,5 @@
+// Guilherme Vilas Boas Barbosa
+//Carina Cavalcante Chaves Leite 2511668
 #include "cria_func.h"
 #include <stdint.h>
 
@@ -30,10 +32,7 @@ static void emit_uint64(unsigned char codigo[], int *i, uint64_t v) {
     }
 }
 
-/*
-    Assembly AT&T:
-    movq %src, %dst
-*/
+
 static void emit_mov_reg64(unsigned char codigo[], int *i, int src, int dst) {
     unsigned char rex = 0x48;
 
@@ -50,10 +49,7 @@ static void emit_mov_reg64(unsigned char codigo[], int *i, int src, int dst) {
     emit1(codigo, i, 0xC0 | ((src & 7) << 3) | (dst & 7));
 }
 
-/*
-    Assembly AT&T:
-    movl $imm, %dst
-*/
+
 static void emit_mov_imm32_to_reg(unsigned char codigo[], int *i, int imm, int dst) {
     if (dst >= 8) {
         emit1(codigo, i, 0x41);
@@ -63,10 +59,7 @@ static void emit_mov_imm32_to_reg(unsigned char codigo[], int *i, int imm, int d
     emit_int32(codigo, i, imm);
 }
 
-/*
-    Assembly AT&T:
-    movabsq $imm, %dst
-*/
+
 static void emit_mov_imm64_to_reg(unsigned char codigo[], int *i, uint64_t imm, int dst) {
     unsigned char rex = 0x48;
 
@@ -79,10 +72,7 @@ static void emit_mov_imm64_to_reg(unsigned char codigo[], int *i, uint64_t imm, 
     emit_uint64(codigo, i, imm);
 }
 
-/*
-    Assembly AT&T:
-    movl (%rax), %dst
-*/
+
 static void emit_load_rax_to_reg32(unsigned char codigo[], int *i, int dst) {
     if (dst >= 8) {
         emit1(codigo, i, 0x44);
@@ -92,10 +82,7 @@ static void emit_load_rax_to_reg32(unsigned char codigo[], int *i, int dst) {
     emit1(codigo, i, ((dst & 7) << 3));
 }
 
-/*
-    Assembly AT&T:
-    movq (%rax), %dst
-*/
+
 static void emit_load_rax_to_reg64(unsigned char codigo[], int *i, int dst) {
     unsigned char rex = 0x48;
 
@@ -129,11 +116,7 @@ void cria_func(void* f, DescParam params[], int n, unsigned char codigo[]) {
     emit1(codigo, &i, 0xE5);
 
     /*
-        Primeiro salvamos os parâmetros recebidos pela função nova.
-
-        Exemplo:
-        Se a função nova recebe x, ele chega em %rdi.
-        Mas talvez depois ele precise ir para %rsi ou %rdx.
+        salvamento dos parametros recebidos pela função nova
     */
     for (p = 0; p < n; p++) {
         if (params[p].orig_val == PARAM) {
@@ -143,11 +126,7 @@ void cria_func(void* f, DescParam params[], int n, unsigned char codigo[]) {
     }
 
     /*
-        Agora montamos os parâmetros da função original.
-
-        1º parâmetro original -> %rdi
-        2º parâmetro original -> %rsi
-        3º parâmetro original -> %rdx
+        montagem dos parametros da função original
     */
     param_index = 0;
 
