@@ -11,11 +11,11 @@
 #define R10 10
 #define R11 11
 
-static void emit1(unsigned char codigo[], int *i, unsigned char b) {
+static void emit1(unsigned char codigo[], int* i, unsigned char b) {
     codigo[(*i)++] = b;
 }
 
-static void emit_int32(unsigned char codigo[], int *i, int v) {
+static void emit_int32(unsigned char codigo[], int* i, int v) {
     uint32_t x = (uint32_t)v;
 
     emit1(codigo, i, x & 0xff);
@@ -24,7 +24,7 @@ static void emit_int32(unsigned char codigo[], int *i, int v) {
     emit1(codigo, i, (x >> 24) & 0xff);
 }
 
-static void emit_uint64(unsigned char codigo[], int *i, uint64_t v) {
+static void emit_uint64(unsigned char codigo[], int* i, uint64_t v) {
     int k;
 
     for (k = 0; k < 8; k++) {
@@ -33,7 +33,7 @@ static void emit_uint64(unsigned char codigo[], int *i, uint64_t v) {
 }
 
 
-static void emit_mov_reg64(unsigned char codigo[], int *i, int src, int dst) {
+static void emit_mov_reg64(unsigned char codigo[], int* i, int src, int dst) {
     unsigned char rex = 0x48;
 
     if (src >= 8) {
@@ -50,7 +50,7 @@ static void emit_mov_reg64(unsigned char codigo[], int *i, int src, int dst) {
 }
 
 
-static void emit_mov_imm32_to_reg(unsigned char codigo[], int *i, int imm, int dst) {
+static void emit_mov_imm32_reg(unsigned char codigo[], int* i, int imm, int dst) {
     if (dst >= 8) {
         emit1(codigo, i, 0x41);
     }
@@ -60,7 +60,7 @@ static void emit_mov_imm32_to_reg(unsigned char codigo[], int *i, int imm, int d
 }
 
 
-static void emit_mov_imm64_to_reg(unsigned char codigo[], int *i, uint64_t imm, int dst) {
+static void emit_mov_imm64_reg(unsigned char codigo[], int* i, uint64_t imm, int dst) {
     unsigned char rex = 0x48;
 
     if (dst >= 8) {
@@ -73,7 +73,7 @@ static void emit_mov_imm64_to_reg(unsigned char codigo[], int *i, uint64_t imm, 
 }
 
 
-static void emit_load_rax_to_reg32(unsigned char codigo[], int *i, int dst) {
+static void emit_rax_reg32(unsigned char codigo[], int* i, int dst) {
     if (dst >= 8) {
         emit1(codigo, i, 0x44);
     }
@@ -83,7 +83,7 @@ static void emit_load_rax_to_reg32(unsigned char codigo[], int *i, int dst) {
 }
 
 
-static void emit_load_rax_to_reg64(unsigned char codigo[], int *i, int dst) {
+static void emit_rax_reg64(unsigned char codigo[], int* i, int dst) {
     unsigned char rex = 0x48;
 
     if (dst >= 8) {
@@ -100,8 +100,8 @@ void cria_func(void* f, DescParam params[], int n, unsigned char codigo[]) {
     int p;
     int param_index = 0;
 
-    int arg_regs[3] = {RDI, RSI, RDX};
-    int temp_regs[3] = {R10, R11, R8};
+    int arg_regs[3] = { RDI, RSI, RDX };
+    int temp_regs[3] = { R10, R11, R8 };
 
     /*
         Prólogo:
@@ -140,9 +140,10 @@ void cria_func(void* f, DescParam params[], int n, unsigned char codigo[]) {
 
         else if (params[p].orig_val == FIX) {
             if (params[p].tipo_val == INT_PAR) {
-                emit_mov_imm32_to_reg(codigo, &i, params[p].valor.v_int, dst);
-            } else {
-                emit_mov_imm64_to_reg(codigo, &i, (uint64_t) params[p].valor.v_ptr, dst);
+                emit_mov_imm32_reg(codigo, &i, params[p].valor.v_int, dst);
+            }
+            else {
+                emit_mov_imm64_reg(codigo, &i, (uint64_t)params[p].valor.v_ptr, dst);
             }
         }
 
@@ -156,12 +157,13 @@ void cria_func(void* f, DescParam params[], int n, unsigned char codigo[]) {
                 ou
                 movq (%rax), registrador    para ponteiro
             */
-            emit_mov_imm64_to_reg(codigo, &i, (uint64_t) params[p].valor.v_ptr, RAX);
+            emit_mov_imm64_reg(codigo, &i, (uint64_t)params[p].valor.v_ptr, RAX);
 
             if (params[p].tipo_val == INT_PAR) {
-                emit_load_rax_to_reg32(codigo, &i, dst);
-            } else {
-                emit_load_rax_to_reg64(codigo, &i, dst);
+                emit_rax_reg32(codigo, &i, dst);
+            }
+            else {
+                emit_rax_reg64(codigo, &i, dst);
             }
         }
     }
@@ -172,7 +174,7 @@ void cria_func(void* f, DescParam params[], int n, unsigned char codigo[]) {
         movabsq $f, %rax
         call *%rax
     */
-    emit_mov_imm64_to_reg(codigo, &i, (uint64_t) f, RAX);
+    emit_mov_imm64_reg(codigo, &i, (uint64_t)f, RAX);
 
     emit1(codigo, &i, 0xFF);
     emit1(codigo, &i, 0xD0);
