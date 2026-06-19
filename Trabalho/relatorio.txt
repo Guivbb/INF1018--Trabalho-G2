@@ -1,0 +1,13 @@
+Carina Cavalcante Chaves Leite 2511668 3WC
+Guilherme Vilas Boas Barbosa 2411726 3WA
+
+
+Estratégia de teste:
+Fizemos o método TDD. Usamos os exemplos dados e testamos um por um. Primeiro dava erro e depois íamos ajustando o código em cada teste. Depois criamos funções para simplificar a função cria_func.
+Para cada valor hexadecimal que colocamos nos parâmetros do emit, nós descobrimos usando o objdump. Tínhamos que criar o código primeiro em assembly e depois usar a mesma lógica para escrever em c.
+
+Param: Esse foi o mais simples de pensar em comparação aos outros. Esse parâmetro já tem o valor armazenado na pilha da função, em posições relativas a %rbp. Então só foi necessário fazer um mov para mover os valores da memória para o registrador.
+
+Fix: No fix o valor do parâmetro é constante, ele não vem da pilha nem da memória, portanto, carregamos o valor diretamente no registrador usando o valor imediato (imm). No caso do tipo inteiro ele carrega o imm de 32 bits e no caso dos ponteiros ele carrega o imm de 64 bits. O valor é colocado diretamente no registrador de destino da chamada da função original.
+
+Ind: O parâmetro é passado por ponteiro, então, usamos o endereço de memória. Primeiro carregamos o endereço em %rax usando o movabs e, depois, acessamos o valor a partir deste endereço, caso o conteúdo seja inteiro, ele vai usar a leitura de 32 bits e caso ele seja ponteiro, vai usar a leitura de 64 bits.
